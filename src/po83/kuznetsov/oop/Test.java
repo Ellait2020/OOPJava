@@ -4,9 +4,26 @@ import po83.kuznetsov.oop.model.*;
 
 public class Test {
     public static void main(String[] args) {
-        lab2tests();
+        //lab2tests();
        // lab1tests();
+        lab3tests();
     }
+    public  static void lab3tests(){
+    System.out.println("Тестирование наследований класса AbstractAccount:");
+    DebitAccount test = new DebitAccount("123",12.3);
+    System.out.println("Номер: "+test.getNumber()+"Баланс: "+test.getBalance());
+    test.setBalance(32.1);
+    test.setNumber("321");
+    System.out.println("Номер: "+test.getNumber()+"Баланс: "+test.getBalance());
+    System.out.println("Тестирование изменений интерфейса Client:");
+    Entity test1=new Entity("Денис");
+    System.out.println("4исло кредитов: "+test1.getCreditScore());
+    Entity test2 = new Entity("Проверка ");
+    test2.addCreditScores(3);
+    System.out.println("Увели4ение кредитныъ о4ков:"+test2.getCreditScore());
+    System.out.println("Статус:"+test2.getStatus());
+    }
+
     public static void lab2tests(){
 
         System.out.println("Проверка интерфейса Account:");

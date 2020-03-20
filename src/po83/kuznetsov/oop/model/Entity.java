@@ -124,6 +124,11 @@ public class Entity implements Client {
         this.creditScore += creditScores;
     }
 
+    @Override
+    public Account[] getCreditAccounts() {
+        return new Account[0];
+    }
+
     public Account set(int index, Account account) {
         return setNode(index, account);
     }
