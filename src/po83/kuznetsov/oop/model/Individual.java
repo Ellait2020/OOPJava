@@ -4,11 +4,13 @@ public class Individual implements  Client{
     protected Account[] accounts;
     public int size;
     String name;
+    private int creditScore;
 
     public Individual() {
         name="";
         size = 16;
         accounts = new Account[size];
+        creditScore=0;
     }
 
     public Individual(int size) {
@@ -200,5 +202,20 @@ public class Individual implements  Client{
     @Override
     public void setName(String name) {
         this.name=name;
+    }
+
+    @Override
+    public int getCreditScore() {
+        return 0;
+    }
+
+    @Override
+    public void addCreditScores(int creditScores) {
+
+    }
+
+    @Override
+    public Account[] getCreditAccounts() {
+        return new Account[0];
     }
 }

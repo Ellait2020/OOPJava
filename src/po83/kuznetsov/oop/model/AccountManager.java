@@ -154,5 +154,53 @@ public class AccountManager {
 
         return null;
     }
+    public Client[] getDebtors() {
+        int newSize = 0;
+        for (int i = 0; i < size; i++) {
+            if (clients[i] != null) {
+                if (clients[i].getCreditAccounts().length > 0) {
+                    newSize++;
+                }
+            }
+        }
+
+        Client[] result = new Client[newSize];
+
+        int j = 0;
+        for (int i = 0; i < size; i++) {
+            if (clients[i] != null) {
+                if (clients[i].getCreditAccounts().length > 0) {
+                    result[j] = clients[i];
+                    j++;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public Client[] getWickedDebtors() {
+        int newSize = 0;
+        for (int i = 0; i < size; i++) {
+            if (clients[i] != null) {
+                if (clients[i].getStatus() == ClientStatus.BAD) {
+                    newSize++;
+                }
+            }
+        }
+
+        Client[] result = new Client[newSize];
+
+        int j = 0;
+        for (int i = 0; i < size; i++) {
+            if (clients[i] != null) {
+                if (clients[i].getStatus() == ClientStatus.BAD && clients[i].getCreditAccounts().length > 0) {
+                    result[j] = clients[i];
+                }
+            }
+        }
+
+        return result;
+    }
 }
 
