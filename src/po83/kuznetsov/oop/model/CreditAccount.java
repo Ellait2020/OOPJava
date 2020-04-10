@@ -1,6 +1,6 @@
 package po83.kuznetsov.oop.model;
 
-public class CreditAccount extends AbstractAccount implements  Credit {
+public class CreditAccount extends AbstractAccount implements  Credit, Cloneable {
     private double AnnualPercentageRate;
 
     public CreditAccount()
@@ -29,7 +29,7 @@ public class CreditAccount extends AbstractAccount implements  Credit {
 
     @Override
     public int hashCode() {
-        return super.hashCode() & 71 & String.format("%f", AnnualPercentageRate).hashCode();
+            return super.hashCode() & 71 & String.format("%f", AnnualPercentageRate).hashCode();
     }
 
     @Override

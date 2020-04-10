@@ -1,6 +1,6 @@
 package po83.kuznetsov.oop.model;
 
-public class Entity implements Client {
+public class Entity implements Client,Cloneable {
     private String name;
     private int size;
     private Node head, tail;
@@ -80,7 +80,7 @@ public class Entity implements Client {
             current = current.next;
         }
 
-        return current.next;
+        return current;
     }
 
     private Node deleteNode(int index) {
@@ -152,19 +152,6 @@ public class Entity implements Client {
 
     public int getCreditScore() {
         return creditScore;
-    }
-
-    public int indexOf(Account account) {
-        Node current = head.next;
-
-        for (int i = 0; i < size; ++i) {
-            if (current.value.equals(account)) {
-                return i;
-            }
-            current = current.next;
-        }
-
-        return -1;
     }
 
     public int getSize() {
@@ -273,10 +260,94 @@ public class Entity implements Client {
         double result = 0;
 
         for (int i = 0; i < size; ++i) {
-            if(current.value!=null){
+            if (current.value != null) {
                 result += current.value.getBalance();
                 current = current.next;
             }
+        }
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        Node current = head.next;
+
+        StringBuilder result = new StringBuilder("Entity:\n" + "name: " + name + "\ncreditScore: " + creditScore + "\n");
+        for (int i = 0; i < size; ++i) {
+            if(current.value!=null){
+                result.append(current.value.toString()).append("\n");
+                current = current.next;
+            }
+        }
+        result.append("total: ").append(totalBalance());
+        return result.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        Node current = head.next;
+        if ((Entity.class == o.getClass()) && (size == ((Entity) o).getSize())) {
+            for (int i = 0; i < size; i++) {
+                if(current.value!=null){
+                    if (!current.value.equals(((Entity) o).get(i))) {
+
+                        return false;
+                    }
+                }
+                current = current.next;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        Node current = head.next;
+        int result = name.hashCode();
+        for (int i = 0; i < getSize(); i++) {
+            result ^= current.value.hashCode();
+            current = current.next;
+        }
+        return result;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Object result = super.clone();
+        ((Entity) result).head = ((Entity) result).tail = new Node();
+        ((Entity) result).head.next = ((Entity) result).tail;
+        ((Entity) result).tail.next = ((Entity) result).head;
+        ((Entity) result).size = 0;
+        Account[] accounts = getAccounts();
+        for (int i = 0; i < ((Entity) result).getSize(); ++i) {
+            ((Entity) result).addNode(new Node(accounts[i]));
+        }
+        return result;
+    }
+
+    public int indexOf(Account account) {
+        Node current = head.next;
+
+        for (int i = 0; i < size; ++i) {
+            if (current.value.equals(account)) {
+                return i;
+            }
+            current = current.next;
+        }
+
+        return -1;
+    }
+
+    @Override
+    public double debtTotal() {
+        Node current = head.next;
+        double result = 0;
+        for(int i = 0; i<size;i++){
+            if(current.value.getClass()==CreditAccount.class){
+                result+=current.value.getBalance();
+            }
+            current = current.next;
         }
         return result;
     }
@@ -286,7 +357,8 @@ class Node {
     Account value;
     Node next;
 
-    public Node() { }
+    public Node() {
+    }
 
     public Node(Account value) {
         this.value = value;

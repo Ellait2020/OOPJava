@@ -6,9 +6,57 @@ public class Test {
     public static void main(String[] args) {
         //lab2tests();
        // lab1tests();
-        lab3tests();
+        //lab3tests();
+        lab4tests();
     }
-    public  static void lab3tests(){
+    public  static  void lab4tests(){
+        System.out.println("Тестирование методов класса DebitAccount:");
+        DebitAccount test = new DebitAccount("123",12.3);
+        DebitAccount test2 = new DebitAccount("123",12.3);
+        DebitAccount test3 = new DebitAccount("321",12.3);
+        DebitAccount test4 = new DebitAccount("123",32.1);
+        System.out.println(test.toString());
+        System.out.println(test.hashCode());
+        System.out.println(test.equals(test2));
+        System.out.println(test.equals(test3));
+        System.out.println(test.equals(test4));
+        System.out.println("Тестирование методов класса Individual:");
+        Individual itest = new Individual("Denis");
+        Individual itest2 = new Individual("Denis");
+        Individual itest3 = new Individual("Kirill");
+        Individual itest4 = new Individual("Denis");
+        itest.add(test3);
+        itest.add(test2);
+        itest2.add(test3);
+        itest2.add(test2);
+        itest4.add(test);
+        System.out.println(itest.toString());
+        System.out.println(itest.hashCode());
+        System.out.println(itest.equals(itest2));
+        System.out.println(itest.equals(itest3));
+        System.out.println(itest.equals(itest4));
+        System.out.println("Тестирование методов класса Entity:");
+        Entity etest = new Entity("Denis");
+        Entity etest2 = new Entity("Denis");
+        Entity etest3 = new Entity("Kirill");
+        Entity etest4 = new Entity("Denis");
+        etest.add(test2);
+        etest2.add(test2);
+        etest4.add(test3);
+        System.out.println(etest.toString());
+        System.out.println(etest.hashCode());
+        System.out.println(etest.equals(etest2));
+        System.out.println(etest.equals(etest3));
+        System.out.println(etest.equals(etest4));
+        System.out.println(etest.totalBalance());
+        System.out.println("Тестирование методов класса AccountManager:");
+        AccountManager atest = new AccountManager();
+        atest.add(itest);
+        atest.add(etest);
+        System.out.println(atest.remove(0));
+        System.out.println(atest.indexOf(etest));
+    }
+   /* public  static void lab3tests(){
     System.out.println("Тестирование наследований класса AbstractAccount:");
     DebitAccount test = new DebitAccount("123",12.3);
     System.out.println("Номер: "+test.getNumber()+"Баланс: "+test.getBalance());
@@ -160,4 +208,5 @@ public class Test {
         accountManager.add(i3);
         Individual[] individuals;
     }
+    */
 }

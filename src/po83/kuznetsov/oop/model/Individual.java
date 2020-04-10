@@ -1,25 +1,26 @@
 package po83.kuznetsov.oop.model;
 
-public class Individual implements  Client{
+public class Individual implements  Client,Cloneable {
     protected Account[] accounts;
     public int size;
     String name;
     private int creditScore;
 
-    public Individual() {
-        name="";
+    public Individual(String name) {
+        this.name =name;
         size = 16;
         accounts = new Account[size];
-        creditScore=0;
+        creditScore = 0;
     }
 
-    public Individual(int size) {
-        this.name="";
+    public Individual(String name,int size) {
+        this.name = name;
         this.size = size;
         accounts = new Account[size];
     }
 
-    public Individual(Account[] accounts) {
+    public Individual(String name,Account[] accounts) {
+        this.name=name;
         size = accounts.length;
         this.accounts = new Account[size];
         for (int i = 0; i < size; i++) {
@@ -30,6 +31,7 @@ public class Individual implements  Client{
     public int getSize() {
         return size;
     }
+
     public boolean add(Account account) {
         for (int i = 0; i < size; i++) {
             if (accounts[i] == null) {
@@ -39,26 +41,23 @@ public class Individual implements  Client{
         }
 
 
-
-        Account[]newAccounts= new Account[size*2];
-        for(int i=0;i<size*2;i++) {
-            if(i<accounts.length)
-            {
-                newAccounts[i]=account;
-            }
-            else {
-                if(newAccounts[i]==null) {
-                    newAccounts[i]=account;
+        Account[] newAccounts = new Account[size * 2];
+        for (int i = 0; i < size * 2; i++) {
+            if (i < accounts.length) {
+                newAccounts[i] = account;
+            } else {
+                if (newAccounts[i] == null) {
+                    newAccounts[i] = account;
                     accounts = newAccounts;
-                    size*=2;
-                    return  true;
+                    size *= 2;
+                    return true;
                 }
             }
-            }
-        return false;
         }
+        return false;
+    }
 
-    public boolean add(int index,Account account) {
+    public boolean add(int index, Account account) {
         if (index < size && accounts[index] == null) {
             this.accounts[index] = account;
             return true;
@@ -73,13 +72,13 @@ public class Individual implements  Client{
         return null;
     }
 
-    public Account get(String accountNumber){
-        for(int i=0;i<size;++i){
-            if(accounts[i].getNumber().equals(accountNumber)) {
+    public Account get(String accountNumber) {
+        for (int i = 0; i < size; ++i) {
+            if (accounts[i].getNumber().equals(accountNumber)) {
                 return accounts[i];
             }
         }
-        return  null;
+        return null;
     }
 
     public boolean hasAccount(String accountNumber) {
@@ -126,14 +125,10 @@ public class Individual implements  Client{
     public Account[] getAccounts() {
         Account[] result = new Account[size];
 
-        for (int i = 0; i < size; ++i)
-        {
-            if (accounts[i] != null)
-            {
+        for (int i = 0; i < size; ++i) {
+            if (accounts[i] != null) {
                 result[i] = accounts[i];
-            }
-            else
-            {
+            } else {
                 result[i] = new DebitAccount();
             }
         }
@@ -144,11 +139,9 @@ public class Individual implements  Client{
     public Account[] sortedAccountsByBalance() {
         Account[] result = new Account[size];
 
-        int j=0;
-        for (int i = 0; i < size; ++i)
-        {
-            if (accounts[i] != null)
-            {
+        int j = 0;
+        for (int i = 0; i < size; ++i) {
+            if (accounts[i] != null) {
                 result[j] = accounts[i];
                 j++;
             }
@@ -158,8 +151,8 @@ public class Individual implements  Client{
         boolean isSorted = false;
 
         while (!isSorted) {
-            for (int i = 0; i < size-1; i++) {
-                if (result[i] != null&&result[i+1] !=null) {
+            for (int i = 0; i < size - 1; i++) {
+                if (result[i] != null && result[i + 1] != null) {
                     isSorted = true;
                     if (result[i].getBalance() > result[i + 1].getBalance()) {
                         isSorted = false;
@@ -172,10 +165,8 @@ public class Individual implements  Client{
             }
         }
 
-        for (int i = 0; i < size; ++i)
-        {
-            if (result[i] == null)
-            {
+        for (int i = 0; i < size; ++i) {
+            if (result[i] == null) {
                 result[i] = new DebitAccount();
             }
         }
@@ -196,26 +187,115 @@ public class Individual implements  Client{
 
     @Override
     public String getName() {
-        return  name;
+        return name;
     }
 
     @Override
     public void setName(String name) {
-        this.name=name;
+        this.name = name;
     }
 
     @Override
     public int getCreditScore() {
-        return 0;
+        return creditScore;
     }
 
     @Override
-    public void addCreditScores(int creditScores) {
-
+    public void addCreditScores(int creditScore) {
+        this.creditScore += creditScore;
     }
 
     @Override
     public Account[] getCreditAccounts() {
-        return new Account[0];
+        return accounts;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder("Individual -" + " name: " + getName() + " creditScore: " + getCreditScore() + "\n");
+        for (int i = 0; i < getSize(); i++) {
+            if(accounts[i]!=null){
+                result.append(accounts[i].toString()).append("\n");
+            }
+        }
+        return result.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o!=null){
+            if ((getClass() == o.getClass()) && (size == ((Individual) o).getSize())) {
+                for (int i = 0; i < size; i++) {
+                    if(accounts[i]!=null){
+                        if (!accounts[i].equals(((Individual) o).accounts[i])) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result =getName().hashCode();
+        for (int i = 0; i < getSize(); i++) {
+            if(accounts[i]!=null){
+                result ^= accounts[i].hashCode();
+            }
+        }
+        return result;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Object result = super.clone();
+        Account[] resultAccounts = new Account[size];
+        for (int i = 0; i < getSize(); i++) {
+            if (accounts[i].getClass() == DebitAccount.class) {
+                resultAccounts[i] = new DebitAccount(accounts[i].getNumber(), accounts[i].getBalance());
+            } else if (accounts[i].getClass() == CreditAccount.class) {
+                resultAccounts[i] = new CreditAccount(accounts[i].getNumber(), accounts[i].getBalance(),
+                        ((CreditAccount) accounts[i]).getAnnualPercentageRate());
+            }
+        }
+
+        ((Individual) result).accounts = resultAccounts;
+
+        return result;
+    }
+
+    @Override
+    public boolean remove(Account account) {
+        boolean result = false;
+        for (int i = 0; i < size; i++) {
+            if (accounts[i].equals(account)) {
+                remove(i);
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public int indexOf(Account account) {
+        for (int i = 0; i < size; i++) {
+            if (accounts[i].equals(account)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public double debtTotal() {
+        double result = 0;
+        Account[] bufferAccounts = getCreditAccounts();
+        for (Account bufferAccount : bufferAccounts) {
+            result += bufferAccount.getBalance();
+        }
+        return result;
     }
 }

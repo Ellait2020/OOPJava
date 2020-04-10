@@ -1,5 +1,7 @@
 package po83.kuznetsov.oop.model;
 
+import java.util.Arrays;
+
 public class AccountManager {
     private Client[] clients;
     int size;
@@ -74,7 +76,7 @@ public class AccountManager {
 
         for (int i = 0; i < size; ++i) {
             if (clients[i] != null) {
-                result[j++] = new Individual(clients[i].getAccounts());
+                result[j++] = new Individual(clients[i].getName(),clients[i].getAccounts());
             }
         }
 
@@ -201,6 +203,38 @@ public class AccountManager {
         }
 
         return result;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < getSize(); i++) {
+            result.append("Client ").append(i).append(" :\n");
+            result.append(clients[i].toString()).append("\n");
+        }
+        return result.toString();
+    }
+
+    public boolean remove(Client client) {
+        boolean result = false;
+        for (int i = 0; i < size; i++) {
+            if (clients[i].equals(client)) {
+                remove(i);
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    public int indexOf(Client client) {
+        for (int i = 0; i < size; i++) {
+            if(clients[i]!=null){
+                if (clients[i].equals(client)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 }
 

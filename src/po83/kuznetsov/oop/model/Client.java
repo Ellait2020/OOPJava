@@ -42,4 +42,7 @@ public interface Client {
         }
     }
     Account[] getCreditAccounts();
+    boolean remove(Account account);
+    int indexOf(Account account);
+    double debtTotal();
 }
