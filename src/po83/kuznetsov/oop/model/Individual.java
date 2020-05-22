@@ -1,10 +1,13 @@
 package po83.kuznetsov.oop.model;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class Individual implements  Client{
+public class Individual implements  Client {
     private static int DEF_SIZE = 16;
     private static int DEF_CREDIT_SCORE = 0;
     protected Account[] accounts;
@@ -28,24 +31,32 @@ public class Individual implements  Client{
         creditScore = DEF_SIZE;
     }
 
-        public Individual(String name, Account[] accounts) {
-            Objects.requireNonNull(name, "Название пустое");
-            Objects.requireNonNull(accounts, "Массив аккаунтов пустой");
+    public Individual(String name, Account[] accounts) {
+        Objects.requireNonNull(name, "Название пустое");
+        Objects.requireNonNull(accounts, "Массив аккаунтов пустой");
 
-            size = accounts.length;
+        size = accounts.length;
         this.accounts = new Account[size];
         for (int i = 0; i < size; i++) {
-            this.accounts[i] = new DebitAccount(
-                    accounts[i].getNumber(), accounts[i].getBalance(),
-                    accounts[i].getCreationDate(), accounts[i].getExpirationDate());
+            if (accounts[i].getClass() == DebitAccount.class) {
+                this.accounts[i] = new DebitAccount(
+                        accounts[i].getNumber(), accounts[i].getBalance(),
+                        accounts[i].getCreationDate(), accounts[i].getExpirationDate());
+            } else if (accounts[i].getClass() == CreditAccount.class) {
+                this.accounts[i] = new CreditAccount(
+                        accounts[i].getNumber(), accounts[i].getBalance(),
+                        accounts[i].getCreationDate(), accounts[i].getExpirationDate(),
+                        ((CreditAccount) accounts[i]).getAnnualPercentageRate());
+            }
         }
-            this.name = name;
-            creditScore = 0;
+        this.name = name;
+        creditScore = 0;
     }
 
     public int getSize() {
         return size;
     }
+
     public boolean add(Account account) throws DuplicateAccountNumberException {
         Objects.requireNonNull(account, "Аккаунт пустой");
 
@@ -59,11 +70,10 @@ public class Individual implements  Client{
             }
         }
         doubleAccountsArraySize();
-        return  add(account);
-        }
+        return add(account);
+    }
 
-    private void doubleAccountsArraySize()
-    {
+    private void doubleAccountsArraySize() {
         Account[] newAccounts = new Account[size * 2];
 
         System.arraycopy(accounts, 0, newAccounts, 0, size);
@@ -117,57 +127,18 @@ public class Individual implements  Client{
         return accounts[index];
     }
 
-    public Account get(String accountNumber){
-        Objects.requireNonNull(accountNumber, "Номер аккаунта пуст");
-
-        if (isNumberNotFormatted(accountNumber)) {
-            throw new InvalidAccountNumberException("Неверный формат номера аккаунта");
-        }
-
-        Account result = null;
-        for(int i=0;i<size;++i){
-            if (accounts[i] != null) {
-                if (accounts[i].getNumber().equals(accountNumber)) {
-                    result = accounts[i];
-                    break;
-                }
-            }
-        }
-        if (Objects.isNull(result)) {
-            throw new NoSuchElementException("Аккаут с номером " + accountNumber + " не найден");
-        }
-
-        return result;
-    }
-
     public int indexOf(Account account) {
         Objects.requireNonNull(account, "Аккаунт пустой");
 
         for (int i = 0; i < size; ++i) {
-                if (accounts[i] != null) {
-                    if (accounts[i].equals(account)) {
-                        return i;
-                    }
-                }
-            }
-
-            return -1;
-        }
-
-    public boolean hasAccount(String accountNumber) {
-        Objects.requireNonNull(accountNumber, "Номер аккаунта пустой");
-
-        if (isNumberNotFormatted(accountNumber)) {
-            throw new InvalidAccountNumberException("Неверный формат номера аккаунта");
-        }
-        for (int i = 0; i < size; i++) {
             if (accounts[i] != null) {
-                if (accounts[i].getNumber().equals(accountNumber)) {
-                    return true;
+                if (accounts[i].equals(account)) {
+                    return i;
                 }
             }
         }
-        return false;
+
+        return -1;
     }
 
     public Account set(int index, Account account) throws DuplicateAccountNumberException {
@@ -221,81 +192,26 @@ public class Individual implements  Client{
                 }
             }
         }
-            throw new NoSuchElementException("аккаунт с номером " + accountNumber + " не найден");
+        throw new NoSuchElementException("аккаунт с номером " + accountNumber + " не найден");
     }
 
     public boolean remove(Account account) {
         Objects.requireNonNull(account, "аккаунт не пустой");
 
         for (int i = 0; i < size; ++i) {
-                if (accounts[i] != null) {
-                    if (accounts[i].equals(account)) {
-                        remove(i);
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-    public Account[] getAccounts() {
-        Account[] result = new Account[size];
-        System.arraycopy(accounts, 0, result, 0, size);
-        return result;
-    }
-
-    public Account[] sortedAccountsByBalance() {
-        Account[] result = new Account[size];
-        System.arraycopy(accounts, 0, result, 0, size);
-        Account buffer;
-        boolean isSorted = false;
-
-        while (!isSorted) {
-            isSorted = true;
-            for (int i = 0; i < size-1; i++) {
-                if (result[i + 1] != null) {
-                    if (result[i] == null || result[i].getBalance() > result[i + 1].getBalance()) {
-                        isSorted = false;
-
-                        buffer = result[i];
-                        result[i] = result[i + 1];
-                        result[i + 1] = buffer;
-                    }
+            if (accounts[i] != null) {
+                if (accounts[i].equals(account)) {
+                    remove(i);
+                    return true;
                 }
             }
         }
-        return result;
-    }
-
-    public double debtTotal() {
-        double result = 0;
-
-        for (int i = 0; i < size; ++i) {
-                if (accounts[i] != null) {
-                    if (accounts[i].getClass() == CreditAccount.class) {
-                        result += accounts[i].getBalance();
-                    }
-                }
-            }
-
-            return result;
-        }
-
-
-        public double totalBalance() {
-        Account[] buffer = getAccounts();
-        double result = 0;
-
-        for (Account account : buffer) {
-            result += account.getBalance();
-        }
-
-        return result;
+        return false;
     }
 
     @Override
     public String getName() {
-        return  name;
+        return name;
     }
 
     @Override
@@ -309,32 +225,8 @@ public class Individual implements  Client{
         return creditScore;
     }
 
-    @Override
     public void addCreditScores(int creditScores) {
         this.creditScore += creditScores;
-    }
-
-    @Override
-    public Account[] getCreditAccounts() {
-        int newSize = 0;
-        for (int i = 0; i < size; ++i) {
-            if (accounts[i] != null) {
-                if (accounts[i].getClass() == CreditAccount.class) {
-                    newSize++;
-                }
-            }
-        }
-        Account[] result = new Account[newSize];
-        int j = 0;
-        for (int i = 0; i < size; ++i) {
-            if (accounts[i] != null) {
-                if (accounts[i].getClass() == CreditAccount.class) {
-                    System.arraycopy(accounts, i, result, j, 1);
-                    j++;
-                }
-            }
-        }
-        return result;
     }
 
     public String toString() {
@@ -347,6 +239,7 @@ public class Individual implements  Client{
         result.append("total: ").append(totalBalance());
         return result.toString();
     }
+
     @Override
     public int hashCode() {
         int result = name.hashCode() ^ creditScore;
@@ -362,38 +255,66 @@ public class Individual implements  Client{
 
     @Override
     public boolean equals(Object o) {
-            if ((getClass() == o.getClass()) && name.equals(((Individual) o).getName()) && (size == ((Individual) o).getSize())) {
-                for (int i = 0; i < size; i++) {
-                        if (accounts[i] != null) {
-                            if (!accounts[i].equals(((Individual) o).accounts[i])) {
-                                return false;
-                            }
-                        }
-                    }
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            protected Object clone() throws CloneNotSupportedException {
-                Object result = super.clone();
-
-                Account[] resultAccounts = new Account[size];
-
-                for (int i = 0; i < size; ++i) {
-                    if (accounts[i].getClass() == DebitAccount.class) {
-                        resultAccounts[i] = new DebitAccount(accounts[i].getNumber(), accounts[i].getBalance(),
-                                accounts[i].getCreationDate(), accounts[i].getExpirationDate());
-                    } else if (accounts[i].getClass() == CreditAccount.class) {
-                        resultAccounts[i] = new CreditAccount(accounts[i].getNumber(), accounts[i].getBalance(),
-                                accounts[i].getCreationDate(), accounts[i].getExpirationDate(),
-                                ((CreditAccount) accounts[i]).getAnnualPercentageRate());
+        if ((getClass() == o.getClass()) && name.equals(((Individual) o).getName()) && (size == ((Individual) o).getSize())) {
+            for (int i = 0; i < size; i++) {
+                if (accounts[i] != null) {
+                    if (!accounts[i].equals(((Individual) o).accounts[i])) {
+                        return false;
                     }
                 }
-
-                ((Individual) result).accounts = resultAccounts;
-
-                return result;
             }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Object result = super.clone();
+
+        Account[] resultAccounts = new Account[size];
+
+        for (int i = 0; i < size; ++i) {
+            if (accounts[i].getClass() == DebitAccount.class) {
+                resultAccounts[i] = new DebitAccount(accounts[i].getNumber(), accounts[i].getBalance(),
+                        accounts[i].getCreationDate(), accounts[i].getExpirationDate());
+            } else if (accounts[i].getClass() == CreditAccount.class) {
+                resultAccounts[i] = new CreditAccount(accounts[i].getNumber(), accounts[i].getBalance(),
+                        accounts[i].getCreationDate(), accounts[i].getExpirationDate(),
+                        ((CreditAccount) accounts[i]).getAnnualPercentageRate());
+            }
+        }
+
+        ((Individual) result).accounts = resultAccounts;
+
+        return result;
+    }
+
+    @Override
+    public Iterator<Account> iterator() {
+        return new AccountIterator();
+    }
+
+    public int compareTo(Client o) {
+        return Double.compare(totalBalance(), o.totalBalance());
+    }
+
+    private class AccountIterator implements java.util.Iterator<Account> {
+        private int index = 0;
+
+        @Override
+        public boolean hasNext() {
+            return index < size;
+        }
+
+        @Override
+        public Account next() {
+            if (hasNext()) {
+                index++;
+                return accounts[index - 1];
+            } else {
+                throw new NoSuchElementException("Элменет не найден");
+            }
+        }
+    }
 }

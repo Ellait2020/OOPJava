@@ -1,5 +1,7 @@
 package po83.kuznetsov.oop.model;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -161,21 +163,6 @@ public class Entity implements Client {
         this.creditScore += creditScores;
     }
 
-    @Override
-    public Account[] getCreditAccounts() {
-        return new Account[0];
-    }
-
-    public Account set(int index, Account account) throws DuplicateAccountNumberException {
-        Objects.requireNonNull(account, "Аккаунт пустой");
-
-        if (isNumberMatchFound(account.getNumber())) {
-            throw new DuplicateAccountNumberException("Аккаунт с номером " + account.getNumber() + " уже существует");
-        }
-
-        return setNode(index, account);
-    }
-
     public Account get(int index) {
         if (index >= size) {
             throw new IndexOutOfBoundsException("Индекс больше чем размер массива");
@@ -186,29 +173,30 @@ public class Entity implements Client {
         return result == null ? null : result.value;
     }
 
-    public Account get(String accountNumber) {
-        Objects.requireNonNull(accountNumber, "Номер аккаунта пустой");
-
-        if (isNumberNotFormatted(accountNumber)) {
-            throw new InvalidAccountNumberException("Неверный формат номера аккаунта");
+    @Override
+    public Account set(int index, Account account) throws DuplicateAccountNumberException {
+        if (index >= size) {
+            throw new IndexOutOfBoundsException("Индекс больше,чем размер массива");
+        } else if (index < 0) {
+            throw new IndexOutOfBoundsException("Индекс больше нуля");
         }
 
-        Account result = null;
-
-        Node current = head.next;
-
+        Objects.requireNonNull(account, "Аккаунт пустой");
+        Node current=head.next;
+        Account changedAccount=null;
         for (int i = 0; i < size; ++i) {
-            if (current.value.getNumber().equals(accountNumber)) {
-                result = current.value;
-                break;
+            if (current.value != null) {
+                if (current.value.getNumber().equals(account.getNumber())) {
+                    throw new DuplicateAccountNumberException("Номер аккаунта " + account.getNumber() + " уже существует");
+                }
             }
+            if(i==index){
+                changedAccount=current.value;
+                current.value=account;
+            }
+            current=current.next;
         }
-
-        if (Objects.isNull(result)) {
-            throw new NoSuchElementException("Аккаунт с номером " + accountNumber + " не найден");
-        }
-
-        return result;
+        return changedAccount;
     }
 
     public int getCreditScore() {
@@ -231,24 +219,6 @@ public class Entity implements Client {
 
     public int getSize() {
         return size;
-    }
-
-    public boolean hasAccount(String accountNumber) {
-        Objects.requireNonNull(accountNumber, "Номер аккаунта пустой");
-
-        if (isNumberNotFormatted(accountNumber)) {
-            throw new InvalidAccountNumberException("Неверный формат номера аккаунта");
-        }
-        Node current = head.next;
-
-        for (int i = 0; i < size; ++i) {
-            if (current.value.getNumber().equals(accountNumber)) {
-                return true;
-            }
-            current = current.next;
-        }
-
-        return false;
     }
 
     public Account remove(int index) {
@@ -302,46 +272,6 @@ public class Entity implements Client {
         return false;
     }
 
-    public Account[] getAccounts() {
-        Node current = head.next;
-
-        Account[] result = new Account[size];
-        for (int i = 0; i < size; ++i) {
-            result[i] = current.value;
-            current = current.next;
-        }
-
-        return result;
-    }
-
-    public Account[] sortedAccountsByBalance() {
-        Node current = head.next;
-
-        Account[] result = new Account[size];
-        for (int i = 0; i < size; ++i) {
-            result[i] = current.value;
-            current = current.next;
-        }
-
-        Account buffer;
-        boolean isSorted = false;
-
-        while (!isSorted) {
-            for (int i = 0; i < result.length - 1; i++) {
-                isSorted = true;
-                if (result[i].getBalance() > result[i + 1].getBalance()) {
-                    isSorted = false;
-
-                    buffer = result[i];
-                    result[i] = result[i + 1];
-                    result[i + 1] = buffer;
-                }
-            }
-        }
-
-        return result;
-    }
-
     public void setName(String name) {
         Objects.requireNonNull(name, "Имя пустое");
         this.name = name;
@@ -349,20 +279,6 @@ public class Entity implements Client {
 
     public String getName() {
         return name;
-    }
-
-    public double totalBalance() {
-        Node current;
-        double result = 0;
-
-        if (size != 0) {
-            current = head.next;
-            for (int i = 0; i < size; ++i) {
-                result += current.value.getBalance();
-                current = current.next;
-            }
-        }
-        return result;
     }
 
     private boolean isNumberMatchFound(String accountNumber) {
@@ -448,7 +364,42 @@ public class Entity implements Client {
         }
         return result;
     }
-}
+
+    @Override
+    public Iterator<Account> iterator() {
+        return new Entity.AccountIterator();
+    }
+
+    public int compareTo(Client o) {
+        return Double.compare(totalBalance(), o.totalBalance());
+    }
+
+    private class AccountIterator implements java.util.Iterator<Account> {
+        private int index = 0;
+        private Node node=head.next;
+
+        @Override
+        public boolean hasNext() {
+            return index < size;
+        }
+
+        @Override
+        public Account next() {
+            if (hasNext()) {
+                index++;
+                if (node != null) {
+                    Account result;
+                    result = node.value;
+                    node = node.next;
+                    return result;
+                } else {
+                    return null;}
+                } else{
+                    throw new NoSuchElementException("Элеменет не найден");
+                }
+            }
+        }
+    }
     class Node {
         Account value;
         Node next;

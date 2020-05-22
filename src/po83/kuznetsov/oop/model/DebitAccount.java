@@ -23,10 +23,10 @@ public class DebitAccount extends AbstractAccount implements Cloneable {
     }
 
     @Override
-    public String toString()
-    {
-        return "Debit account: " +
-                super.toString();
+    public String toString() {
+        return "Debit account - " + "number: " + getNumber() + " balance: " + getBalance() +
+                " CreationDate: " + getCreationDate().toString() +
+                " ExpirationDate: " + getExpirationDate().toString();
     }
 
     @Override

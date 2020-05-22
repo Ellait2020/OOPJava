@@ -1,10 +1,11 @@
 package po83.kuznetsov.oop.model;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class AccountManager {
+public class AccountManager implements java.lang.Iterable<Client>{
     private static int DEF_SIZE = 16;
     private Client[] clients;
     int size;
@@ -259,7 +260,15 @@ public class AccountManager {
         return result;
     }
 
-
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        for (Client client : this) {
+            if (!Objects.isNull(client)) {
+                result.append(client.toString()).append("\n");
+            }
+        }
+        return result.toString();
+    }
 
     public Client[] getWickedDebtors() {
         int newSize = 0;
@@ -290,5 +299,29 @@ public class AccountManager {
         Objects.requireNonNull(accountNumber, "Номер аккаунта пустой");
         return !Pattern.matches("^4[045]\\d{3}810\\d(?!0{4})\\d{4}(?!0{7})\\d{7}$", accountNumber);
     }
+
+    @Override
+    public Iterator<Client> iterator() {
+        return new ClientIterator();
+    }
+    private class ClientIterator implements java.util.Iterator<Client> {
+        private int index = 0;
+
+        @Override
+        public boolean hasNext() {
+            return index < size;
+        }
+
+        @Override
+        public Client next() {
+            if (hasNext()) {
+                index++;
+                return clients[index - 1];
+            } else {
+                throw new NoSuchElementException("Элменет не найден");
+            }
+        }
+    }
 }
+
 

@@ -78,5 +78,10 @@ public abstract class AbstractAccount implements Account {
         int result = period.getYears() * 12 + period.getMonths();
         return result == 0 ? 1 : result;
     }
+
+    @Override
+    public int compareTo(Account o) {
+        return Double.compare(getBalance(), o.getBalance());
+    }
 }
 

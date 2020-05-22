@@ -1,7 +1,6 @@
 package po83.kuznetsov.oop.model;
 import java.time.LocalDate;
-
-public interface Account {
+public interface Account extends java.lang.Comparable<Account> {
     String getNumber();
     void setNumber(String number);
     double getBalance();
