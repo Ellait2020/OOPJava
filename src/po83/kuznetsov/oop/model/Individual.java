@@ -1,7 +1,6 @@
 package po83.kuznetsov.oop.model;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -53,33 +52,158 @@ public class Individual implements  Client {
         creditScore = 0;
     }
 
-    public int getSize() {
+    public int size() {
         return size;
     }
 
-    public boolean add(Account account) throws DuplicateAccountNumberException {
-        Objects.requireNonNull(account, "Аккаунт пустой");
-
-        if (isNumberMatchFound(account.getNumber())) {
-            throw new DuplicateAccountNumberException("Номер аккаунта " + account.getNumber() + " уже существует");
-        }
-        for (int i = 0; i < size; i++) {
-            if (accounts[i] == null) {
-                accounts[i] = account;
-                return true;
+    @Override
+    public boolean isEmpty() {
+        for (Account bufer : this) {
+            if (!Objects.isNull(bufer)) {
+                return false;
             }
         }
-        doubleAccountsArraySize();
-        return add(account);
+        return true;
     }
 
-    private void doubleAccountsArraySize() {
-        Account[] newAccounts = new Account[size * 2];
+    @Override
+    public boolean contains(Object o) {
+        for (Account bufer : this) {
+            if(!Objects.isNull(bufer)){
+                if (bufer.equals(o)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
-        System.arraycopy(accounts, 0, newAccounts, 0, size);
-        size *= 2;
+    @Override
+    public boolean remove(Object o) {
+        Objects.requireNonNull(o, "Передан пустой объект");
+        for (int i = 0; i < size(); ++i)
+        {
+            if (!Objects.isNull(accounts[i])) {
+                if (accounts[i].equals(o)) {
+                    System.arraycopy(accounts, i + 1, accounts, i, size() - i - 1);
+                    accounts[size() - i - 1] = null;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
-        accounts = newAccounts;
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        Objects.requireNonNull(c, "Передана пустая коллекция");
+        boolean result = false;
+        for (Object o : c) {
+            for (Account account : this) {
+                if (Objects.isNull(account)) {
+                    if (Objects.isNull(o)) {
+                        result = true;
+                    }
+                } else if (account.equals(o)) {
+                    result = true;
+                    break;
+                }
+            }
+            if (!result) {
+                break;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends Account> c) {
+        Objects.requireNonNull(c, "Передана пустая коллекция");
+        for (Account account : c) {
+            for (int i = 0; i < size; i++) {
+                if (Objects.isNull(accounts[i])) {
+                    accounts[i] = account;
+                    break;
+                }
+                if (i == size - 1) {
+                    Account[] newAccounts = new Account[size * 2];
+                    System.arraycopy(accounts, 0, newAccounts, 0, size);
+                    accounts = newAccounts;
+                    size *= 2;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        Objects.requireNonNull(c, "Передана пустая коллекция");
+
+        int index;
+        boolean result = false;
+        for (Object o : c) {
+            index = 0;
+            for (int i = 0; i < size; i++) {
+                if (Objects.isNull(accounts[i])) {
+                    if (Objects.isNull(o)) {
+                        result = true;
+                        break;
+                    }
+                } else if (accounts[i].equals(o)) {
+                    System.arraycopy(accounts, i + 1, accounts, i, size() - i - 1);
+                    accounts[size() - i - 1] = null;
+                    result = true;
+                    break;
+                }
+                index++;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        Objects.requireNonNull(c, "Передана пустая коллекция");
+
+        boolean result = false;
+
+        int index = 0;
+        boolean isEquals;
+        boolean isChanged;
+        for (Account account : this) {
+            isEquals = false;
+            isChanged = false;
+            for (Object o : c) {
+                if (Objects.isNull(account)) {
+                    if (Objects.isNull(o)) {
+                        isEquals = true;
+                        break;
+                    }
+                } else if (account.equals(o)) {
+                    isEquals = true;
+                    break;
+                } else {
+                    isChanged = true;
+                }
+            }
+
+            if (isEquals) {
+                index++;
+            } else if (isChanged) {
+                System.arraycopy(accounts, index + 1, accounts, index, size() - index - 1);
+                accounts[size() - index - 1] = null;
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public void clear() {
+        for (int i = 0; i < size; ++i) {
+            accounts[i] = null;
+        }
     }
 
     private boolean isNumberMatchFound(String accountNumber) {
@@ -115,6 +239,31 @@ public class Individual implements  Client {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean add(Account account) {
+        Objects.requireNonNull(account, "Аккаунт пустой");
+
+        int index = 0;
+        for (Account buffer : this) {
+            if (Objects.isNull(buffer)) {
+                accounts[index] = account;
+                return true;
+            }
+            index++;
+        }
+        doubleAccountsArraySize();
+        return add(account);
+    }
+
+    private void doubleAccountsArraySize() {
+        Account[] newAccounts = new Account[size * 2];
+
+        System.arraycopy(accounts, 0, newAccounts, 0, size);
+        size = newAccounts.length;
+
+        accounts = newAccounts;
     }
 
     public Account get(int index) {
@@ -195,20 +344,6 @@ public class Individual implements  Client {
         throw new NoSuchElementException("аккаунт с номером " + accountNumber + " не найден");
     }
 
-    public boolean remove(Account account) {
-        Objects.requireNonNull(account, "аккаунт не пустой");
-
-        for (int i = 0; i < size; ++i) {
-            if (accounts[i] != null) {
-                if (accounts[i].equals(account)) {
-                    remove(i);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     @Override
     public String getName() {
         return name;
@@ -255,7 +390,7 @@ public class Individual implements  Client {
 
     @Override
     public boolean equals(Object o) {
-        if ((getClass() == o.getClass()) && name.equals(((Individual) o).getName()) && (size == ((Individual) o).getSize())) {
+        if ((getClass() == o.getClass()) && name.equals(((Individual) o).getName()) && (size == ((Individual) o).size())) {
             for (int i = 0; i < size; i++) {
                 if (accounts[i] != null) {
                     if (!accounts[i].equals(((Individual) o).accounts[i])) {
@@ -293,6 +428,28 @@ public class Individual implements  Client {
     @Override
     public Iterator<Account> iterator() {
         return new AccountIterator();
+    }
+
+    @Override
+    public Object[] toArray() {
+        Account[] result = new Account[size];
+        int index = 0;
+        for (Account bufer : this) {
+            result[index] = bufer;
+            index++;
+        }
+        return result;
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        Account[] result = new Account[size];
+        int index = 0;
+        for (Account account : this) {
+            result[index] = account;
+            index++;
+        }
+        return (T[]) result;
     }
 
     public int compareTo(Client o) {
