@@ -365,7 +365,7 @@ public class Individual implements  Client {
     }
 
     public String toString() {
-        StringBuilder result = new StringBuilder("Individual:\n" + "name: " + name + "\ncreditScore: " + creditScore + "\n");
+        StringBuilder result = new StringBuilder("Individual:\n" + "Имя: " + name + "\ncreditScore: " + creditScore + "\n");
         for (Account a : accounts) {
             if (a != null) {
                 result.append(a.toString()).append("\n");
@@ -434,8 +434,8 @@ public class Individual implements  Client {
     public Object[] toArray() {
         Account[] result = new Account[size];
         int index = 0;
-        for (Account bufer : this) {
-            result[index] = bufer;
+        for (Account buffer : this) {
+            result[index] = buffer;
             index++;
         }
         return result;

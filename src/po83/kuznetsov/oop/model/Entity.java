@@ -23,16 +23,21 @@ public class Entity implements Client {
     public Entity(String name, Account[] accounts) {
         Objects.requireNonNull(name, "Имя пустое");
         Objects.requireNonNull(accounts, "Массив аккаунтов пустой");
+
         this.name = name;
         size = accounts.length;
+
         head = new Node();
+
         Node current = head;
         for (Account account : accounts) {
             current.next = new Node(account);
             current = current.next;
         }
+
         tail = current;
         tail.next = head;
+
         creditScore = 0;
     }
 
@@ -40,9 +45,19 @@ public class Entity implements Client {
         if (head == null) {
             head = tail = new Node();
         }
-        tail.next = node;
-        tail = tail.next;
-        tail.next = head;
+
+        if (tail == head)
+        {
+            tail = node;
+            tail.next = head;
+            head.next = tail;
+        }
+        else
+        {
+            tail.next = node;
+            tail = tail.next;
+            tail.next = head;
+        }
         size++;
 
         return true;
@@ -50,15 +65,9 @@ public class Entity implements Client {
 
     private boolean addNode(int index, Node node) {
         if (index < 0) {
-            throw new IndexOutOfBoundsException("Индекс больше чем размер массива");
-        } else if (index >= size) {
             throw new IndexOutOfBoundsException("Индекс меньше нуля");
-        }
-        if (head == null) {
-            head = tail = new Node();
-            tail.next = node;
-            tail = tail.next;
-            tail.next = head;
+        } else if (index >= size) {
+            throw new IndexOutOfBoundsException("Индекс больше чем размер массива");
         }
         Node current = head.next;
         for (int i = 0; i < index; ++i) {
@@ -72,9 +81,9 @@ public class Entity implements Client {
 
     private Node getNode(int index) {
         if (index >= size) {
-            throw new IndexOutOfBoundsException("Индекс больше чем размер массива");
+            throw new IndexOutOfBoundsException("Иднекс больше чем размер массива");
         } else if (index < 0) {
-            throw new IndexOutOfBoundsException("Индекс меньше нуля");
+            throw new IndexOutOfBoundsException("Идекс меньше нуля");
         }
         Node current = head.next;
         for (int i = 0; i < index; ++i) {
@@ -87,16 +96,19 @@ public class Entity implements Client {
         if (index >= size) {
             throw new IndexOutOfBoundsException("Иднекс больше чем размер массива");
         } else if (index < 0) {
-            throw new IndexOutOfBoundsException("Индекс меньше нуля");
+            throw new IndexOutOfBoundsException("Идекс меньше нуля");
         }
         Node current = head;
         for (int i = 0; i < index; ++i) {
             current = current.next;
         }
-        Node buffer = current.next;
-        current.next = buffer.next;
+        Node result = current.next;
+        current.next = current.next.next;
         size--;
-        return buffer;
+        if (index == size) {
+            tail = current;
+        }
+        return result;
     }
 
     private Account setNode(int index, Account account) {
@@ -438,14 +450,14 @@ public class Entity implements Client {
 
     @Override
     public boolean contains(Object o) {
-        for (Account bufer : this) {
-            if(Objects.isNull(bufer)){
+        for (Account buffer : this) {
+            if(Objects.isNull(buffer)){
                 if(Objects.isNull(o)){
                     return true;
                 }
             }
             else if (!Objects.isNull(o)) {
-                if(bufer.equals(o)){
+                if(buffer.equals(o)){
                     return true;
                 }
             }
