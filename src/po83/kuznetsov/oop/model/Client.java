@@ -1,13 +1,10 @@
 package po83.kuznetsov.oop.model;
 
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
-public interface Client extends java.lang.Iterable<Account>,java.lang.Comparable<Client> {
-    boolean add(Account account) throws DuplicateAccountNumberException;
-    int getSize();
+public interface Client extends java.lang.Iterable<Account>,java.lang.Comparable<Client>,java.util.Collection<Account> {
+    int size();
     boolean add(int index, Account account) throws DuplicateAccountNumberException;
     Account get(int index);
     default public Account get(String accountNumber) {
@@ -50,31 +47,9 @@ public interface Client extends java.lang.Iterable<Account>,java.lang.Comparable
     Account set(int index, Account account) throws DuplicateAccountNumberException;
     Account remove(int index);
     Account remove(String accountNumber);
-    default public Account[] getAccounts() {
-        Account[] result = new Account[getSize()];
-        int index=0;
-        for(Account buffer:this){
-            result[index]=buffer;
-            index++;
-        }
-        return result;
-    }
-    default public Account[] sortedAccountsByBalance() {
-        int newsize=0;
-        for(Account buffer:this){
-            if(buffer!=null){
-                newsize++;
-            }
-        }
-        Account[] result = new Account[newsize];
-        int index=0;
-        for(Account buffer:this){
-            if(buffer!=null){
-                result[index]=buffer;
-                index++;
-            }
-        }
-        Arrays.sort(result);
+    default List<Account> sortedAccountsByBalance() {
+        List<Account> result = new ArrayList<>(this);
+        Collections.sort(result);
         return result;
     }
     default public double totalBalance() {
@@ -90,25 +65,17 @@ public interface Client extends java.lang.Iterable<Account>,java.lang.Comparable
     }
     String getName();
     void setName(String name);
-    default public Account[] getCreditAccounts() {
-        int newSize = 0;
-        for (Account buffer:this) {
-            if (buffer != null) {
-                if (buffer.getClass() == CreditAccount.class) {
-                    newSize++;
+    default Collection<Credit> getCreditAccounts() {
+        LinkedList<Credit> result = new LinkedList<>();
+
+        for (Account account : this) {
+            if (!Objects.isNull(account)) {
+                if (account.getClass().equals(CreditAccount.class)) {
+                    result.add((Credit) account);
                 }
             }
         }
-        Account[] result = new Account[newSize];
-        int j = 0;
-        for (Account buffer:this) {
-            if (buffer != null) {
-                if (buffer.getClass() == CreditAccount.class) {
-                    result[j]=buffer;
-                    j++;
-                }
-            }
-        }
+
         return result;
     }
     public int getCreditScore();

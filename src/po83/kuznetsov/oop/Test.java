@@ -13,10 +13,123 @@ public class Test {
         //lab3tests();
         //lab4tests();
         //lab5tests();
-        lab6tests();
+        //lab6tests();
+        lab7tests();
     }
 
-    public static void lab6tests() {
+    static void lab7tests() {
+        Account a1 = new DebitAccount("40000810100011234561", LocalDate.now().plusMonths(1));
+        Account a2 = new DebitAccount("40000810100011234562", LocalDate.now().plusMonths(1));
+        Account a3 = new DebitAccount("40000810100011234563", LocalDate.now().plusMonths(1));
+        Account a4 = new CreditAccount("44000810100011234564", LocalDate.now().plusMonths(1));
+        Account a5 = new CreditAccount("44000810100011234565", LocalDate.now().plusMonths(1));
+        Account[] accounts = new Account[2];
+        accounts[0] = a4;
+        accounts[1] = a5;
+
+        System.out.println("Проверка Collection в Entity");
+        Entity entity1 = new Entity("Денис");
+        System.out.println("Проверка на добавление аккаунта:");
+        System.out.println(entity1.add(a1));
+        System.out.println(entity1.add(a2));
+        System.out.println("Проверка на добавление коллекции:");
+        System.out.println(entity1.addAll(Arrays.asList(accounts)));
+        System.out.println("Проверка на удаление существующего/не существующего аккаунта:");
+        System.out.println(entity1.remove(a1));
+        System.out.println(entity1.remove(a4));
+        System.out.println("Проверка на удаление дублика аккаунта:");
+        System.out.println(entity1.remove(a1));
+        System.out.println("Проверка на удаление из коллекции совпадений переданных в коллеции:");
+        System.out.println(entity1.removeAll(Arrays.asList(accounts)));
+        System.out.println(entity1.removeAll(Arrays.asList(accounts)));
+        System.out.println("Проверка на удаление элементов из коллеции не содержащихся в переданной колекции:");
+        entity1.addAll(Arrays.asList(accounts));
+        System.out.println(entity1.retainAll(Arrays.asList(accounts)));
+        System.out.println(entity1.retainAll(Arrays.asList(accounts)));
+        System.out.println("Проверка на поиск совпадений(найдены все элементы и вернёт true:");
+        System.out.println(entity1.containsAll(Arrays.asList(accounts)));
+        System.out.println("Проверка на поиск совпадения:");
+        System.out.println(entity1.contains(a5));
+        entity1.clear();
+        System.out.println("ПРОВЕРКА МЕТОДОВ ПОСЛЕ ОЧИЩЕНИЯ МАССИВА:");
+        entity1.add(a4);
+        System.out.println("Проверка на поиск совпадений(найдёт только 1 элемент,но вернёт true):");
+        System.out.println(entity1.containsAll(Arrays.asList(accounts)));
+        System.out.println("Проверка на поиск совпадения:");
+        System.out.println(entity1.contains(a5));
+        System.out.println(entity1.contains(a4));
+        System.out.println("Проверка на наличие элементов:");
+        System.out.println(entity1.isEmpty());
+        entity1.remove(a4);
+        System.out.println("Проверка на наличие элементов после удаления единственного элемента:");
+        System.out.println(entity1.isEmpty());
+        System.out.println();
+        System.out.println("Очищение и передача содержания нового массива:");
+        entity1.clear();
+        entity1.addAll(Arrays.asList(accounts));
+        for (Credit account : entity1.getCreditAccounts()) {
+            System.out.println(account);
+        }
+
+        System.out.println("Проверка Collection в Individual");
+        Individual individual1 = new Individual("Настя");
+        System.out.println("Проверка на добавление аккаунта:");
+        System.out.println(individual1.add(a1));
+        System.out.println(individual1.add(a2));
+        System.out.println("Проверка на добавление коллекции:");
+        System.out.println(individual1.addAll(Arrays.asList(accounts)));
+        System.out.println("Проверка на удаление существующего/не существующего аккаунта:");
+        System.out.println(individual1.remove(a1));
+        System.out.println(individual1.remove(a3));
+        System.out.println("Проверка на удаление уже удалённого аккаунта:");
+        System.out.println(individual1.remove(a1));
+        System.out.println("Проверка на удаление из коллекции совпадений переданных в коллеции:");
+        System.out.println(individual1.removeAll(Arrays.asList(accounts)));
+        System.out.println(individual1.removeAll(Arrays.asList(accounts)));
+        System.out.println("Проверка на удаление элементов из коллеции не содержащихся в переданной колекции:");
+        individual1.addAll(Arrays.asList(accounts));
+        System.out.println(individual1.retainAll(Arrays.asList(accounts)));
+        System.out.println(individual1.retainAll(Arrays.asList(accounts)));
+        System.out.println("Проверка на поиск совпадений(найдены все элементы и вернёт true:");
+        System.out.println(individual1.containsAll(Arrays.asList(accounts)));
+        System.out.println("Проверка на поиск совпадения:");
+        System.out.println(individual1.contains(a5));
+        individual1.clear();
+        System.out.println("ПРОВЕРКА МЕТОДОВ ПОСЛЕ ОЧИЩЕНИЯ МАССИВА:");
+        individual1.add(a4);
+        System.out.println("Проверка на поиск совпадений(найдёт только 1 элемент,но вернёт true):");
+        System.out.println(individual1.containsAll(Arrays.asList(accounts)));
+        System.out.println("Проверка на поиск совпадения:");
+        System.out.println(individual1.contains(a5));
+        System.out.println(individual1.contains(a4));
+        System.out.println("Проверка на наличие элементов:");
+        System.out.println(individual1.isEmpty());
+        individual1.remove(a4);
+        System.out.println("Проверка на наличие элементов после удаления единственного элемента:");
+        System.out.println(individual1.isEmpty());
+        System.out.println();
+        System.out.println("Очищение и передача содержания нового массива:");
+        individual1.clear();
+        individual1.addAll(Arrays.asList(accounts));
+        for (Credit account : individual1.getCreditAccounts()) {
+            System.out.println(account);
+        }
+
+        System.out.println("Проверка Collection в AccountManager");
+        entity1.add(a4);
+        individual1.add(a5);
+        AccountManager am = new AccountManager();
+        am.add(entity1);
+        am.add(individual1);
+        individual1.addCreditScores(-4);
+        System.out.println(Arrays.toString(am.getClients()));
+        System.out.println("\nВывод всех клиентов(должников):");
+        System.out.println(Arrays.toString(am.getDebtors().toArray()));
+        System.out.println("\nВывод всех клиентов(должников с плохим статусом):");
+        System.out.println(Arrays.toString(am.getWickedDebtors().toArray()));
+    }
+}
+  /*  public static void lab6tests() {
         Account[] accounts = new Account[5];
         accounts[0] = new DebitAccount("40000810100010000001", 1, LocalDate.now(),
                 LocalDate.now().plusMonths(1));

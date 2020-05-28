@@ -1,8 +1,6 @@
 package po83.kuznetsov.oop.model;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class AccountManager implements java.lang.Iterable<Client>{
@@ -98,26 +96,9 @@ public class AccountManager implements java.lang.Iterable<Client>{
         return result;
     }
 
-    public Client[] sortedClientByBalance() {
-        Client[] result = new Client[size];
-        System.arraycopy(clients, 0, result, 0, size);
-        Client buffer;
-        boolean isSorted = false;
-
-        while (!isSorted) {
-            isSorted = true;
-            for (int i = 0; i < size - 1; i++) {
-                if (result[i + 1] != null) {
-                    if (result[i] == null || result[i].totalBalance() > result[i + 1].totalBalance()) {
-                        isSorted = false;
-
-                        buffer = result[i];
-                        result[i] = result[i + 1];
-                        result[i + 1] = buffer;
-                    }
-                }
-            }
-        }
+    public List<Client> sortedClientsByBalance() {
+        ArrayList<Client> result = new ArrayList<>(Arrays.asList(clients));
+        Collections.sort(result);
         return result;
     }
     public Account getAccount(String accountNumber) {
@@ -129,7 +110,7 @@ public class AccountManager implements java.lang.Iterable<Client>{
 
         for (int i = 0; i < size; ++i) {
             if (clients[i] != null) {
-                buffer = clients[i].getAccounts();
+                buffer =(Account[]) clients[i].toArray();
                 for (Account account : buffer) {
                     if (account != null) {
                         if (account.getNumber().equals(accountNumber)) {
@@ -153,7 +134,7 @@ public class AccountManager implements java.lang.Iterable<Client>{
         Account[] buffer;
 
         for (int i = 0; i < size; ++i) {
-            buffer = clients[i].getAccounts();
+            buffer = (Account[]) clients[i].toArray();
             for (int j = 0; j < buffer.length; ++j) {
                 if (buffer[i].getNumber().equals(accountNumber)) {
                     result = buffer[i];
@@ -211,7 +192,7 @@ public class AccountManager implements java.lang.Iterable<Client>{
         Account[] bufferAccounts;
         for (int i = 0; i < size; ++i) {
             if (clients[i] != null) {
-                bufferAccounts = clients[i].getAccounts();
+                bufferAccounts = (Account[])clients[i].toArray();
                 for (int j = 0; j < bufferAccounts.length; ++j) {
                     if (bufferAccounts[j].getNumber().equals(account.getNumber())) {
                         throw new DuplicateAccountNumberException(
@@ -236,27 +217,32 @@ public class AccountManager implements java.lang.Iterable<Client>{
 
         return result;
     }
-    public Client[] getDebtors() {
-        int newSize = 0;
-        for (int i = 0; i < size; i++) {
-            if (clients[i] != null) {
-                if (clients[i].getCreditAccounts().length > 0) {
-                    newSize++;
+
+    public Set<Client> getDebtors() {
+        HashSet<Client> result = new HashSet<>();
+
+        for (Client client : this) {
+            if (!Objects.isNull(client)) {
+                if (client.getCreditAccounts().size() > 0) {
+                    result.add(client);
                 }
             }
         }
 
-        Client[] result = new Client[newSize];
+        return result;
+    }
 
-        int j = 0;
-        for (int i = 0; i < size; i++) {
-            if (clients[i] != null) {
-                if (clients[i].getCreditAccounts().length > 0) {
-                    System.arraycopy(clients, i, result, j, 1);
-                    j++;
+    public Set<Client> getWickedDebtors() {
+        HashSet<Client> result = new HashSet<>();
+
+        for (Client client : this) {
+            if (!Objects.isNull(client)) {
+                if (client.getStatus() == ClientStatus.BAD && client.getCreditAccounts().size() > 0) {
+                    result.add(client);
                 }
             }
         }
+
         return result;
     }
 
@@ -268,31 +254,6 @@ public class AccountManager implements java.lang.Iterable<Client>{
             }
         }
         return result.toString();
-    }
-
-    public Client[] getWickedDebtors() {
-        int newSize = 0;
-        for (int i = 0; i < size; i++) {
-            if (clients[i] != null) {
-                if (clients[i].getStatus() == ClientStatus.BAD) {
-                    newSize++;
-                }
-            }
-        }
-
-        Client[] result = new Client[newSize];
-
-        int j = 0;
-        for (int i = 0; i < size; i++) {
-            if (clients[i] != null) {
-                if (clients[i].getStatus() == ClientStatus.BAD && clients[i].getCreditAccounts().length > 0) {
-                    System.arraycopy(clients, i, result, j, 1);
-                    j++;
-                }
-            }
-        }
-
-        return result;
     }
 
     private boolean isNumberNotFormatted(String accountNumber) {
